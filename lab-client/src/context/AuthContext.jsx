@@ -54,6 +54,19 @@ export function AuthProvider({ children }) {
     localStorage.setItem('lab_user', JSON.stringify(nextUser))
   }
 
+  const updateCurrentUser = (nextUser) => {
+    if (!nextUser) return
+
+    setUser((prev) => {
+      const merged = {
+        ...(prev || {}),
+        ...nextUser,
+      }
+      localStorage.setItem('lab_user', JSON.stringify(merged))
+      return merged
+    })
+  }
+
   const logout = async () => {
     try {
       await logoutApi()
@@ -69,7 +82,7 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ user, token, loading, login, logout }),
+    () => ({ user, token, loading, login, logout, updateCurrentUser }),
     [user, token, loading],
   )
 

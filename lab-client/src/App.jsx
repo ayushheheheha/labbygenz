@@ -17,6 +17,7 @@ import QuizAttempt from './pages/student/QuizAttempt'
 import QuizResult from './pages/student/QuizResult'
 import IDEPractice from './pages/student/IDEPractice'
 import IDEProblemList from './pages/student/IDEProblemList'
+import Profile from './pages/student/Profile'
 
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminCourses from './pages/admin/AdminCourses'
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="/ide/:problemId" element={<IDEPractice />} />
             <Route element={<StudentLayout />}>
               <Route path="/" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/courses/:slug" element={<CourseDetail />} />
               <Route path="/courses/:slug/ide-problems" element={<IDEProblemList />} />
               <Route path="/quiz/:id" element={<QuizAttempt />} />

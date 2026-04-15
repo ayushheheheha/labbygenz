@@ -123,12 +123,16 @@ export default function CourseDetail() {
       <div>
         <p className="font-semibold text-slate-100">{quiz.title}</p>
         <p className="mt-1 text-sm text-surface-muted">{quiz.description || 'Timed quiz'}</p>
+        {quiz.user_has_attempted ? (
+          <p className="mt-1 text-xs text-success">Attempted {quiz.attempt_count > 1 ? `(${quiz.attempt_count} times)` : ''}</p>
+        ) : null}
       </div>
       <div className="flex items-center gap-2">
         <Badge>{quiz.question_count || 0} Q</Badge>
         <Badge variant="warning">{quiz.time_limit_minutes || 0} min</Badge>
+        {quiz.user_has_attempted ? <Badge variant="success">Done</Badge> : null}
         <Link to={`/quiz/${quiz.id}`}>
-          <Button size="sm">Start Quiz</Button>
+          <Button size="sm">{quiz.user_has_attempted ? 'Retry Quiz' : 'Start Quiz'}</Button>
         </Link>
       </div>
     </div>
@@ -201,6 +205,9 @@ export default function CourseDetail() {
             const isOpen = openWeekNumber === week.week_number
             const items = weekQuizCache[week.week_number] || []
             const isWeekLoading = !!weekLoading[week.week_number]
+            const totalInWeek = items.length
+            const attemptedInWeek = items.filter((quiz) => quiz.user_has_attempted).length
+            const weekCompleted = totalInWeek > 0 && attemptedInWeek >= totalInWeek
 
             return (
               <Card key={week.id || week.week_number} className="p-0">
@@ -211,9 +218,15 @@ export default function CourseDetail() {
                 >
                   <div>
                     <p className="text-sm text-surface-muted">Week {week.week_number}</p>
-                    <h3 className="mt-1 text-lg font-semibold">{week.title || `Week ${week.week_number}`}</h3>
+                    <div className="mt-1 flex items-center gap-2">
+                      <h3 className="text-lg font-semibold">{week.title || `Week ${week.week_number}`}</h3>
+                      {weekCompleted ? <Badge variant="success">Completed</Badge> : null}
+                    </div>
                   </div>
-                  <span className="text-sm text-surface-muted">{isOpen ? 'Hide' : 'Show'}</span>
+                  <div className="text-right text-sm text-surface-muted">
+                    <p>{isOpen ? 'Hide' : 'Show'}</p>
+                    {!isWeekLoading && totalInWeek > 0 ? <p className="text-xs">{attemptedInWeek}/{totalInWeek} attempted</p> : null}
+                  </div>
                 </button>
 
                 {isOpen && (

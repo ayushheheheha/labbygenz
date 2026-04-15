@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAttemptResultApi } from '../../api/attempt.api'
+import { getLeaderboardApi } from '../../api/quiz.api'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Skeleton from '../../components/ui/Skeleton'
 import RichText from '../../components/shared/RichText'
 import CodeBlock from '../../components/shared/CodeBlock'
+import useAuth from '../../hooks/useAuth'
 
 function getCorrectOptionTexts(answer) {
   return (answer.options || []).filter((option) => option.is_correct).map((option) => option.option_text)
@@ -40,15 +42,24 @@ function getStudentAnswerText(answer) {
 export default function QuizResult() {
   const { attemptId, id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [result, setResult] = useState(null)
+  const [leaderboard, setLeaderboard] = useState([])
+  const [myRank, setMyRank] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
       try {
-        const { data } = await getAttemptResultApi(attemptId)
-        setResult(data)
+        const [{ data: resultData }, { data: leaderboardData }] = await Promise.all([
+          getAttemptResultApi(attemptId),
+          getLeaderboardApi(id),
+        ])
+
+        setResult(resultData)
+        setLeaderboard(Array.isArray(leaderboardData?.top) ? leaderboardData.top : [])
+        setMyRank(leaderboardData?.me || null)
       } catch {
         toast.error('Unable to fetch result')
       } finally {
@@ -114,6 +125,42 @@ export default function QuizResult() {
             <Button variant="secondary">Back to Home</Button>
           </Link>
         </div>
+      </Card>
+
+      <Card>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">Leaderboard</h2>
+          {myRank?.rank ? <Badge variant="info">Your Rank: #{myRank.rank}</Badge> : null}
+        </div>
+
+        {!leaderboard.length ? (
+          <p className="text-sm text-surface-muted">No leaderboard data yet for this quiz.</p>
+        ) : (
+          <div className="space-y-2">
+            {leaderboard.map((item) => {
+              const isCurrentUser = user?.id && Number(item.user_id) === Number(user.id)
+              return (
+                <div
+                  key={`leaderboard-${item.rank}-${item.user_id}`}
+                  className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
+                    isCurrentUser ? 'border-brand/60 bg-brand/10' : 'border-surface-border bg-surface-raised'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-surface-card text-xs font-semibold">
+                      {item.rank}
+                    </span>
+                    <span className="text-sm font-medium text-slate-100">{item.name}</span>
+                  </div>
+                  <div className="text-right text-sm">
+                    <p className="font-semibold text-slate-100">{Number(item.percentage || 0).toFixed(2)}%</p>
+                    <p className="text-xs text-surface-muted">{Number(item.score || 0).toFixed(2)} / {Number(item.total_marks || 0).toFixed(2)}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </Card>
 
       <Card>

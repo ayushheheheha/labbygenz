@@ -7,17 +7,31 @@ import Skeleton from '../../components/ui/Skeleton'
 import EmptyState from '../../components/ui/EmptyState'
 import Badge from '../../components/ui/Badge'
 import useAuth from '../../hooks/useAuth'
+import { getStudentProgressApi } from '../../api/student.api'
 
 export default function Home() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [courses, setCourses] = useState([])
+  const [progressBySlug, setProgressBySlug] = useState({})
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const { data } = await getCoursesApi()
-        setCourses(Array.isArray(data) ? data : data?.courses || [])
+        const [{ data: coursesData }, { data: progressData }] = await Promise.all([
+          getCoursesApi(),
+          getStudentProgressApi(),
+        ])
+
+        const normalizedCourses = Array.isArray(coursesData) ? coursesData : coursesData?.courses || []
+        setCourses(normalizedCourses)
+
+        const rows = Array.isArray(progressData?.course_progress) ? progressData.course_progress : []
+        const map = rows.reduce((acc, row) => {
+          acc[row.course_slug] = row
+          return acc
+        }, {})
+        setProgressBySlug(map)
       } catch {
         toast.error('Failed to load courses')
       } finally {
@@ -75,13 +89,32 @@ export default function Home() {
         {courses.map((course) => (
           <Link key={course.id || course.slug} to={`/courses/${course.slug}`}>
             <Card className="h-full rounded-2xl border border-surface-border p-6 transition duration-200 hover:-translate-y-[3px] hover:border-brand/70 hover:shadow-glow">
+              {progressBySlug[course.slug] ? (
+                <div className="mb-4">
+                  <div className="mb-1 flex items-center justify-between text-xs text-surface-muted">
+                    <span>Progress</span>
+                    <span>{Math.round(Number(progressBySlug[course.slug]?.completion_percent || 0))}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-surface-raised">
+                    <div
+                      className="h-full rounded-full bg-brand transition-all duration-300"
+                      style={{ width: `${Math.max(0, Math.min(100, Number(progressBySlug[course.slug]?.completion_percent || 0)))}%` }}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               <p className="text-[3rem] leading-none">{course.icon || '📘'}</p>
               <h3 className="mt-4 text-[1.1rem] font-bold">{course.name}</h3>
               <p className="mt-2 line-clamp-2 text-sm text-surface-muted">
                 {course.description || 'Practice and revise your concepts.'}
               </p>
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-xs text-surface-muted">Open course</span>
+                <span className="text-xs text-surface-muted">
+                  {progressBySlug[course.slug]
+                    ? `${progressBySlug[course.slug].attempted_quizzes || 0}/${progressBySlug[course.slug].total_quizzes || 0} quizzes done`
+                    : 'Open course'}
+                </span>
                 {course.has_ide ? <Badge variant="info">IDE</Badge> : null}
               </div>
             </Card>

@@ -19,12 +19,9 @@ export default function StudentLayout() {
             <NavLink to="/" className={({ isActive }) => (isActive ? 'text-brand' : 'hover:text-white')}>
               My Courses
             </NavLink>
-            <button
-              onClick={() => navigate('/')}
-              className="hover:text-white"
-            >
+            <NavLink to="/profile" className={({ isActive }) => (isActive ? 'text-brand' : 'hover:text-white')}>
               Progress
-            </button>
+            </NavLink>
           </nav>
 
           <div className="relative">
@@ -45,7 +42,7 @@ export default function StudentLayout() {
                 <button
                   onClick={() => {
                     setOpen(false)
-                    navigate('/')
+                    navigate('/profile')
                   }}
                   className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-300 hover:bg-surface-raised"
                 >
