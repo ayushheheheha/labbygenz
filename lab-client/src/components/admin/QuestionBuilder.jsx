@@ -10,13 +10,14 @@ import {
   updateAdminQuestionFormApi,
 } from '../../api/admin.api'
 import { resolveMediaUrl } from '../../utils/media'
+import Icon from '../ui/Icon'
 
 const TYPE_CARDS = [
-  { value: 'mcq', label: 'Multiple Choice', icon: '📝' },
-  { value: 'multi_select', label: 'Multi-Select', icon: '☑️' },
-  { value: 'true_false', label: 'True / False', icon: '✅' },
-  { value: 'short_answer', label: 'Short Answer', icon: '💬' },
-  { value: 'numerical', label: 'Numerical', icon: '🔢' },
+  { value: 'mcq', label: 'Multiple Choice', icon: 'quiz' },
+  { value: 'multi_select', label: 'Multi-Select', icon: 'checkSquare' },
+  { value: 'true_false', label: 'True / False', icon: 'check' },
+  { value: 'short_answer', label: 'Short Answer', icon: 'chat' },
+  { value: 'numerical', label: 'Numerical', icon: 'number' },
 ]
 
 const CODE_LANGS = ['pseudocode', 'python', 'java', 'cpp', 'general']
@@ -338,7 +339,7 @@ export default function QuestionBuilder({
                     : 'border-surface-border bg-surface-raised hover:border-brand/60'
                 }`}
               >
-                <p className="text-lg">{typeCard.icon}</p>
+                <Icon name={typeCard.icon} size="md" className="text-surface-muted" />
                 <p className="mt-1 text-sm font-semibold">{typeCard.label}</p>
               </button>
             ))}

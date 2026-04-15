@@ -8,6 +8,7 @@ import EmptyState from '../../components/ui/EmptyState'
 import Badge from '../../components/ui/Badge'
 import useAuth from '../../hooks/useAuth'
 import { getStudentProgressApi } from '../../api/student.api'
+import { CourseIcon } from '../../components/ui/Icon'
 
 export default function Home() {
   const { user } = useAuth()
@@ -66,7 +67,7 @@ export default function Home() {
   if (!courses.length) {
     return (
       <EmptyState
-        icon="📚"
+        icon="courses"
         title="No courses available"
         description="Your enrolled courses will appear here once they are published."
       />
@@ -76,7 +77,7 @@ export default function Home() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[1.75rem] font-semibold">Hey, {user?.name || 'Student'} 👋</h1>
+        <h1 className="text-[1.75rem] font-semibold">Hey, {user?.name || 'Student'}</h1>
         <p className="mt-1 text-sm text-surface-muted">Ready to practice?</p>
       </div>
 
@@ -104,7 +105,9 @@ export default function Home() {
                 </div>
               ) : null}
 
-              <p className="text-[3rem] leading-none">{course.icon || '📘'}</p>
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-surface-raised text-surface-muted">
+                <CourseIcon value={course.icon} size="lg" />
+              </div>
               <h3 className="mt-4 text-[1.1rem] font-bold">{course.name}</h3>
               <p className="mt-2 line-clamp-2 text-sm text-surface-muted">
                 {course.description || 'Practice and revise your concepts.'}

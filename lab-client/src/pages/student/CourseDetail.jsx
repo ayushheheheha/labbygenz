@@ -8,6 +8,7 @@ import Skeleton from '../../components/ui/Skeleton'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import EmptyState from '../../components/ui/EmptyState'
+import { CourseIcon } from '../../components/ui/Icon'
 
 export default function CourseDetail() {
   const { slug } = useParams()
@@ -153,7 +154,9 @@ export default function CourseDetail() {
       <Card className="rounded-2xl p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[2.2rem] leading-none">{course?.icon || '📘'}</p>
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-surface-border bg-surface-raised text-surface-muted">
+              <CourseIcon value={course?.icon} size="lg" />
+            </div>
             <h1 className="mt-3 text-2xl font-semibold">{course?.name || slug}</h1>
             <p className="mt-2 max-w-3xl text-sm text-surface-muted">
               {course?.description || 'Course outline and weekly practice.'}
@@ -259,7 +262,7 @@ export default function CourseDetail() {
             </div>
           ) : !hasAnyExamPrep ? (
             <EmptyState
-              icon="🧪"
+              icon="test"
               title="No exam prep quizzes"
               description="Exam preparation quizzes will appear here when available."
             />
@@ -294,7 +297,7 @@ export default function CourseDetail() {
             </div>
           ) : !ideWeeks.length ? (
             <EmptyState
-              icon="💻"
+              icon="code"
               title="No IDE problems"
               description="IDE practice problems will appear here when available."
             />
@@ -315,7 +318,7 @@ export default function CourseDetail() {
                             {problem.difficulty}
                           </Badge>
                           <Link to={`/ide/${problem.id}`}>
-                            <Button size="sm">Solve →</Button>
+                            <Button size="sm">Solve</Button>
                           </Link>
                         </div>
                       </div>

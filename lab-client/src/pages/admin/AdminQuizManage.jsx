@@ -19,6 +19,7 @@ import Input from '../../components/ui/Input'
 import QuestionBuilder from '../../components/admin/QuestionBuilder'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import { resolveMediaUrl } from '../../utils/media'
+import Icon from '../../components/ui/Icon'
 import {
   DndContext,
   PointerSensor,
@@ -67,7 +68,9 @@ function SortableQuestionItem({ question, isActive, onSelect, onEdit, onDelete }
     >
       <div className="flex items-start justify-between gap-2">
         <button type="button" onClick={() => onSelect(question)} className="flex flex-1 items-start gap-2 text-left">
-          <span {...attributes} {...listeners} className="cursor-grab text-surface-muted" title="Drag to reorder">⠿</span>
+          <span {...attributes} {...listeners} className="cursor-grab text-surface-muted" title="Drag to reorder">
+            <Icon name="drag" size="sm" />
+          </span>
           <div className="min-w-0">
             <p className="text-xs text-surface-muted">#{(question.position ?? 0) + 1}</p>
             <p className="line-clamp-2 text-sm font-medium">{stripMarkdown(question.stem).slice(0, 60) || 'Untitled question'}</p>
@@ -79,8 +82,12 @@ function SortableQuestionItem({ question, isActive, onSelect, onEdit, onDelete }
           </div>
         </button>
         <div className="flex items-center gap-1">
-          <button type="button" onClick={() => onEdit(question)} className="rounded-md px-2 py-1 text-xs text-brand hover:bg-surface-card">✏️</button>
-          <button type="button" onClick={() => onDelete(question)} className="rounded-md px-2 py-1 text-xs text-danger hover:bg-surface-card">🗑️</button>
+          <button type="button" onClick={() => onEdit(question)} className="rounded-md px-2 py-1 text-brand hover:bg-surface-card">
+            <Icon name="edit" size="sm" />
+          </button>
+          <button type="button" onClick={() => onDelete(question)} className="rounded-md px-2 py-1 text-danger hover:bg-surface-card">
+            <Icon name="trash" size="sm" />
+          </button>
         </div>
       </div>
     </div>

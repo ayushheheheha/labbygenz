@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button'
 import SlideOver from '../../components/ui/SlideOver'
 import Input from '../../components/ui/Input'
 import Badge from '../../components/ui/Badge'
+import { CourseIcon } from '../../components/ui/Icon'
 
 export default function AdminCourses() {
   const [courses, setCourses] = useState([])
@@ -19,7 +20,7 @@ export default function AdminCourses() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    icon: '📘',
+    icon: '',
     has_ide: false,
   })
 
@@ -41,7 +42,7 @@ export default function AdminCourses() {
     setForm({
       name: course.name || '',
       description: course.description || '',
-      icon: course.icon || '📘',
+      icon: course.icon || '',
       has_ide: !!course.has_ide,
     })
   }
@@ -74,7 +75,7 @@ export default function AdminCourses() {
   }
 
   if (!courses.length) {
-    return <EmptyState icon="📚" title="No courses found" description="Create your first course from admin tools." />
+    return <EmptyState icon="courses" title="No courses found" description="Create your first course from admin tools." />
   }
 
   return (
@@ -84,7 +85,9 @@ export default function AdminCourses() {
           <Card key={course.id || course.slug} className="rounded-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-3xl">{course.icon || '📘'}</p>
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised text-surface-muted">
+                  <CourseIcon value={course.icon} size="lg" />
+                </div>
                 <h3 className="mt-2 text-lg font-semibold">{course.name}</h3>
               </div>
               <Badge variant={course.is_active ? 'success' : 'warning'}>

@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
+import Icon from '../ui/Icon'
 
 const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: '🏠' },
-  { to: '/admin/courses', label: 'Courses', icon: '📚' },
-  { to: '/admin/quizzes', label: 'Quizzes', icon: '📝' },
-  { to: '/admin/ide-problems', label: 'IDE Problems', icon: '💻' },
+  { to: '/admin', label: 'Dashboard', icon: 'home' },
+  { to: '/admin/courses', label: 'Courses', icon: 'courses' },
+  { to: '/admin/quizzes', label: 'Quizzes', icon: 'quiz' },
+  { to: '/admin/ide-problems', label: 'IDE Problems', icon: 'code' },
 ]
 
 export default function AdminLayout() {
@@ -28,7 +29,7 @@ export default function AdminLayout() {
                 }`
               }
             >
-              <span>{item.icon}</span>
+              <Icon name={item.icon} size="sm" />
               {item.label}
             </NavLink>
           ))}

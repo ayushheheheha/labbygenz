@@ -7,6 +7,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import RichText from '../../components/shared/RichText'
 import Badge from '../../components/ui/Badge'
+import Icon from '../../components/ui/Icon'
 
 const SPLITTER_HEIGHT = 10
 const MIN_TOP_PANE = 220
@@ -231,10 +232,10 @@ export default function IDEPractice() {
   const runPassed = runResults.filter((item) => item.passed).length
 
   const verdictMap = {
-    accepted: { label: 'Accepted', color: 'text-success', icon: '✅' },
-    wrong_answer: { label: 'Wrong Answer', color: 'text-danger', icon: '❌' },
-    runtime_error: { label: 'Runtime Error', color: 'text-warning', icon: '⚠️' },
-    time_limit_exceeded: { label: 'Time Limit Exceeded', color: 'text-warning', icon: '⏱' },
+    accepted: { label: 'Accepted', color: 'text-success', icon: 'check' },
+    wrong_answer: { label: 'Wrong Answer', color: 'text-danger', icon: 'x' },
+    runtime_error: { label: 'Runtime Error', color: 'text-warning', icon: 'warning' },
+    time_limit_exceeded: { label: 'Time Limit Exceeded', color: 'text-warning', icon: 'clock' },
   }
 
   const verdict = submitResult?.status ? verdictMap[submitResult.status] || verdictMap.wrong_answer : null
@@ -247,7 +248,10 @@ export default function IDEPractice() {
         <Card className="h-full overflow-hidden p-0">
           <div className="flex h-full flex-col">
             <div className="border-b border-surface-border p-4">
-              <button type="button" onClick={() => navigate(-1)} className="text-sm text-brand hover:text-brand-light">← Back</button>
+              <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-brand hover:text-brand-light">
+                <Icon name="arrowLeft" size="xs" />
+                <span>Back</span>
+              </button>
               <h1 className="mt-2 text-xl font-semibold">{problem?.title || `Problem ${problemId}`}</h1>
               <div className="mt-2 flex gap-2">
                 <Badge variant={problem?.difficulty === 'easy' ? 'success' : problem?.difficulty === 'medium' ? 'warning' : 'danger'}>
@@ -399,7 +403,10 @@ export default function IDEPractice() {
                     <h3 className="text-sm font-semibold">Sample Test Results - {runPassed}/{runResults.length} Passed</h3>
                     {runResults.map((item) => (
                       <div key={`run-${item.case_number}`} className="rounded-lg border border-surface-border bg-surface-raised p-3 text-xs">
-                        <p className="font-semibold">Case {item.case_number} {item.passed ? '✓' : '✗'}</p>
+                        <p className="inline-flex items-center gap-1 font-semibold">
+                          <span>Case {item.case_number}</span>
+                          <Icon name={item.passed ? 'check' : 'x'} size="xs" className={item.passed ? 'text-success' : 'text-danger'} />
+                        </p>
                         <div className="mt-2">
                           <p className="text-surface-muted">Input:</p>
                           <p className="font-mono whitespace-pre-wrap">{formatDisplayText(item.input)}</p>
@@ -421,13 +428,20 @@ export default function IDEPractice() {
                   <div className="space-y-3">
                     {verdict ? (
                       <div className="rounded-lg border border-surface-border bg-surface-raised p-4">
-                        <p className={`text-xl font-bold ${verdict.color}`}>{verdict.icon} {verdict.label}</p>
+                        <p className={`inline-flex items-center gap-2 text-xl font-bold ${verdict.color}`}>
+                          <Icon name={verdict.icon} size="md" />
+                          <span>{verdict.label}</span>
+                        </p>
                       </div>
                     ) : null}
 
                     {(submitResult.test_results || []).map((item) => (
                       <div key={`submit-${item.case_number}`} className="rounded-lg border border-surface-border bg-surface-raised p-3 text-sm">
-                        <p>Test Case {item.case_number}: {item.passed ? '✓ Passed' : '✗ Failed'}</p>
+                        <p className="inline-flex items-center gap-1">
+                          <span>Test Case {item.case_number}:</span>
+                          <Icon name={item.passed ? 'check' : 'x'} size="xs" className={item.passed ? 'text-success' : 'text-danger'} />
+                          <span>{item.passed ? 'Passed' : 'Failed'}</span>
+                        </p>
                         {item.is_hidden ? null : (
                           <div className="mt-2 space-y-1 text-xs">
                             <div>

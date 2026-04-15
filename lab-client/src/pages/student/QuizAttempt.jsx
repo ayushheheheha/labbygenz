@@ -12,6 +12,7 @@ import RichText from '../../components/shared/RichText'
 import CodeBlock from '../../components/shared/CodeBlock'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import { resolveMediaUrl } from '../../utils/media'
+import Icon from '../../components/ui/Icon'
 
 function formatTime(totalSeconds) {
   const safe = Math.max(0, totalSeconds)
@@ -253,7 +254,9 @@ export default function QuizAttempt() {
         }`}
       >
         <div className="flex items-start gap-3">
-          <span className="mt-0.5 text-xs text-surface-muted">{isMulti ? '☑' : '◉'}</span>
+          <span className="mt-0.5 text-surface-muted">
+            <Icon name={isMulti ? 'checkSquare' : 'circle'} size="xs" />
+          </span>
           <div className="w-full">
             {option.option_type === 'code' ? (
               <CodeBlock language={option.code_language || 'plaintext'} code={option.option_text || ''} />
@@ -299,11 +302,11 @@ export default function QuizAttempt() {
   }
 
   if (!quiz) {
-    return <EmptyState icon="📝" title="Quiz unavailable" description="This quiz is not available right now." />
+    return <EmptyState icon="quiz" title="Quiz unavailable" description="This quiz is not available right now." />
   }
 
   if (!questions.length) {
-    return <EmptyState icon="🧩" title="No questions found" description="This quiz currently has no questions." />
+    return <EmptyState icon="puzzle" title="No questions found" description="This quiz currently has no questions." />
   }
 
   if (!attemptId) {

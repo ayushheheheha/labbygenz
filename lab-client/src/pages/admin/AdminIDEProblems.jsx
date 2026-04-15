@@ -503,7 +503,7 @@ export default function AdminIDEProblems() {
       </div>
 
       {!loading && !problems.length ? (
-        <EmptyState icon="💻" title="No IDE problems" description="Add coding problems to power practical exercises." />
+        <EmptyState icon="code" title="No IDE problems" description="Add coding problems to power practical exercises." />
       ) : null}
 
       {!!problems.length ? (

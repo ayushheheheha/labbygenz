@@ -16,12 +16,13 @@ import Button from '../../components/ui/Button'
 import SlideOver from '../../components/ui/SlideOver'
 import Badge from '../../components/ui/Badge'
 import Input from '../../components/ui/Input'
+import Icon from '../../components/ui/Icon'
 
 const sectionOptions = [
-  { value: 'practice', label: 'Practice', icon: '🧠' },
-  { value: 'quiz1', label: 'Quiz 1', icon: '📝' },
-  { value: 'quiz2', label: 'Quiz 2', icon: '📘' },
-  { value: 'endterm', label: 'End Term', icon: '🏁' },
+  { value: 'practice', label: 'Practice', icon: 'practice' },
+  { value: 'quiz1', label: 'Quiz 1', icon: 'quiz' },
+  { value: 'quiz2', label: 'Quiz 2', icon: 'book' },
+  { value: 'endterm', label: 'End Term', icon: 'flag' },
 ]
 
 const sectionBadgeMap = {
@@ -219,7 +220,7 @@ export default function AdminQuizList() {
                 form.section === section.value ? 'border-brand bg-brand/10' : 'border-surface-border bg-surface-raised'
               }`}
             >
-              <p className="text-lg">{section.icon}</p>
+              <Icon name={section.icon} size="md" className="text-surface-muted" />
               <p className="mt-1 text-sm font-semibold">{section.label}</p>
             </button>
           ))}
@@ -332,7 +333,7 @@ export default function AdminQuizList() {
           <p className="text-surface-muted">Loading quizzes...</p>
         </Card>
       ) : !quizzes.length ? (
-        <EmptyState icon="📝" title="No quizzes yet" description="Create and manage quizzes from this page." />
+        <EmptyState icon="quiz" title="No quizzes yet" description="Create and manage quizzes from this page." />
       ) : (
         <Card className="overflow-x-auto p-0">
           <table className="min-w-full text-left text-sm">

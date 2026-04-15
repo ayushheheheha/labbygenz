@@ -42,7 +42,7 @@ export default function IDEProblemList() {
   if (!problems.length) {
     return (
       <EmptyState
-        icon="💻"
+        icon="code"
         title="No IDE problems"
         description="IDE coding problems are not available for this course yet."
       />

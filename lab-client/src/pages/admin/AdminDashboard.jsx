@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import { getAdminStatsApi } from '../../api/admin.api'
 import Card from '../../components/ui/Card'
 import Skeleton from '../../components/ui/Skeleton'
+import Icon from '../../components/ui/Icon'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
@@ -40,10 +41,10 @@ export default function AdminDashboard() {
   }
 
   const statCards = [
-    { label: 'Total Students', value: stats.total_students ?? 0, icon: '🎓' },
-    { label: 'Total Quizzes', value: stats.total_quizzes ?? 0, icon: '📝' },
-    { label: 'Total Questions', value: stats.total_questions ?? 0, icon: '❓' },
-    { label: "Today's Attempts", value: stats.total_attempts_today ?? 0, icon: '📈' },
+    { label: 'Total Students', value: stats.total_students ?? 0, icon: 'users' },
+    { label: 'Total Quizzes', value: stats.total_quizzes ?? 0, icon: 'quiz' },
+    { label: 'Total Questions', value: stats.total_questions ?? 0, icon: 'question' },
+    { label: "Today's Attempts", value: stats.total_attempts_today ?? 0, icon: 'trend' },
   ]
 
   return (
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2">
         {statCards.map((item) => (
           <Card key={item.label} className="rounded-2xl">
-            <p className="text-2xl">{item.icon}</p>
+            <Icon name={item.icon} size="lg" className="text-surface-muted" />
             <p className="mt-3 text-[2rem] font-bold leading-none">{item.value}</p>
             <p className="mt-1 text-sm text-surface-muted">{item.label}</p>
           </Card>
