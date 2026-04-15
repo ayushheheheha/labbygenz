@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { useState } from 'react'
 
@@ -6,6 +6,9 @@ export default function StudentLayout() {
   const { user, logout } = useAuth()
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const disablePageAnimation = location.pathname.startsWith('/code') || location.pathname.startsWith('/ide/')
 
   return (
     <div className="min-h-screen bg-surface">
@@ -21,6 +24,9 @@ export default function StudentLayout() {
             </NavLink>
             <NavLink to="/profile" className={({ isActive }) => (isActive ? 'text-brand' : 'hover:text-white')}>
               Progress
+            </NavLink>
+            <NavLink to="/code" className={({ isActive }) => (isActive ? 'text-brand' : 'hover:text-white')}>
+              Code
             </NavLink>
           </nav>
 
@@ -61,7 +67,7 @@ export default function StudentLayout() {
       </header>
 
       <main className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-6">
-        <div className="page-enter">
+        <div className={disablePageAnimation ? '' : 'page-enter'}>
           <Outlet />
         </div>
       </main>

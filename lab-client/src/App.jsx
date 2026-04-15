@@ -18,6 +18,7 @@ import QuizResult from './pages/student/QuizResult'
 import IDEPractice from './pages/student/IDEPractice'
 import IDEProblemList from './pages/student/IDEProblemList'
 import Profile from './pages/student/Profile'
+import CodePlayground from './pages/student/CodePlayground'
 
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminCourses from './pages/admin/AdminCourses'
@@ -51,6 +52,7 @@ export default function App() {
             <Route element={<StudentLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/code" element={<CodePlayground />} />
               <Route path="/courses/:slug" element={<CourseDetail />} />
               <Route path="/courses/:slug/ide-problems" element={<IDEProblemList />} />
               <Route path="/quiz/:id" element={<QuizAttempt />} />
