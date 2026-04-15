@@ -2,6 +2,21 @@ import { Fragment } from 'react'
 import { BlockMath, InlineMath } from 'react-katex'
 import CodeBlock from './CodeBlock'
 
+function normalizeEscapedNewlines(value) {
+  return String(value || '').replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n')
+}
+
+function isHtmlContent(value) {
+  return /<\/?[a-z][\s\S]*>/i.test(value)
+}
+
+function sanitizeHtml(value) {
+  // Basic guard for obviously unsafe tags in admin-authored content.
+  return value
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
+}
+
 function parseInline(text, keyPrefix) {
   const result = []
   let index = 0
@@ -71,9 +86,20 @@ function parseInline(text, keyPrefix) {
 }
 
 export default function RichText({ content = '' }) {
+  const normalizedContent = normalizeEscapedNewlines(content)
+
+  if (isHtmlContent(normalizedContent)) {
+    return (
+      <div
+        className="space-y-3 leading-7 text-slate-200"
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(normalizedContent) }}
+      />
+    )
+  }
+
   const blocks = []
   const blockMathRegex = /(\$\$[\s\S]*?\$\$)/g
-  const parts = content.split(blockMathRegex)
+  const parts = normalizedContent.split(blockMathRegex)
 
   parts.forEach((part, partIndex) => {
     if (!part) return

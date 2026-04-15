@@ -23,16 +23,16 @@ export default function SlideOver({
         onClick={onClose}
       />
       <aside
-        className={`absolute right-0 top-0 h-full border-l border-surface-border bg-surface-card shadow-card transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ width }}
+        className={`absolute right-0 top-0 flex h-full max-w-[100vw] flex-col border-l border-surface-border bg-surface-card shadow-card transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ width: `min(${width}, 100vw)` }}
       >
-        <header className="flex items-center justify-between border-b border-surface-border px-5 py-4">
+        <header className="flex shrink-0 items-center justify-between border-b border-surface-border px-5 py-4">
           <h3 className="text-lg font-semibold">{title}</h3>
           <button onClick={onClose} className="rounded-md px-2 py-1 text-surface-muted hover:bg-surface-raised hover:text-white">
             x
           </button>
         </header>
-        <div className="h-[calc(100%-64px)] overflow-y-auto p-5">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
       </aside>
     </div>
   )

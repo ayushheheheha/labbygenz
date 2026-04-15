@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getCourseBySlugApi, getCourseWeeksApi, getExamPrepApi, getWeekQuizzesApi } from '../../api/course.api'
+import { getIdeByCourseApi } from '../../api/ide.api'
 import Card from '../../components/ui/Card'
 import Skeleton from '../../components/ui/Skeleton'
 import Button from '../../components/ui/Button'
@@ -20,8 +21,15 @@ export default function CourseDetail() {
   const [weekLoading, setWeekLoading] = useState({})
   const [examPrep, setExamPrep] = useState({ quiz1: [], quiz2: [], endterm: [] })
   const [examLoading, setExamLoading] = useState(false)
+  const [examLoaded, setExamLoaded] = useState(false)
+  const [ideWeeks, setIdeWeeks] = useState([])
+  const [ideLoading, setIdeLoading] = useState(false)
+  const [ideLoaded, setIdeLoaded] = useState(false)
 
   useEffect(() => {
+    setExamLoaded(false)
+    setExamPrep({ quiz1: [], quiz2: [], endterm: [] })
+
     const load = async () => {
       try {
         const [{ data: courseData }, { data: weeksData }] = await Promise.all([
@@ -42,7 +50,7 @@ export default function CourseDetail() {
 
   useEffect(() => {
     if (activeTab !== 'exam') return
-    if (examPrep.quiz1.length || examPrep.quiz2.length || examPrep.endterm.length) return
+    if (examLoaded) return
 
     const loadExamPrep = async () => {
       setExamLoading(true)
@@ -57,11 +65,32 @@ export default function CourseDetail() {
         toast.error('Unable to load exam prep quizzes')
       } finally {
         setExamLoading(false)
+        setExamLoaded(true)
       }
     }
 
     loadExamPrep()
-  }, [activeTab, examPrep, slug])
+  }, [activeTab, examLoaded, slug])
+
+  useEffect(() => {
+    if (activeTab !== 'ide') return
+    if (ideLoaded) return
+
+    const loadIde = async () => {
+      setIdeLoading(true)
+      try {
+        const { data } = await getIdeByCourseApi(slug)
+        setIdeWeeks(Array.isArray(data?.weeks) ? data.weeks : [])
+      } catch {
+        toast.error('Unable to load IDE practice problems')
+      } finally {
+        setIdeLoading(false)
+        setIdeLoaded(true)
+      }
+    }
+
+    loadIde()
+  }, [activeTab, ideLoaded, slug])
 
   const onToggleWeek = async (weekNumber) => {
     setOpenWeekNumber((prev) => (prev === weekNumber ? null : weekNumber))
@@ -153,6 +182,17 @@ export default function CourseDetail() {
         >
           Exam Prep
         </button>
+        {(course?.has_ide || course?.has_ide_problems) ? (
+          <button
+            type="button"
+            onClick={() => setActiveTab('ide')}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              activeTab === 'ide' ? 'bg-brand text-white' : 'text-surface-muted hover:bg-surface-raised'
+            }`}
+          >
+            IDE Practice
+          </button>
+        ) : null}
       </div>
 
       {activeTab === 'practice' && (
@@ -226,6 +266,50 @@ export default function CourseDetail() {
                 <h3 className="text-lg font-semibold">Endterm</h3>
                 {examPrep.endterm.length ? examPrep.endterm.map(renderQuizRow) : <p className="text-sm text-surface-muted">No Endterm items.</p>}
               </section>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {activeTab === 'ide' && (
+        <Card>
+          {ideLoading ? (
+            <div className="space-y-3">
+              <Skeleton height="68px" rounded="0.8rem" />
+              <Skeleton height="68px" rounded="0.8rem" />
+              <Skeleton height="68px" rounded="0.8rem" />
+            </div>
+          ) : !ideWeeks.length ? (
+            <EmptyState
+              icon="💻"
+              title="No IDE problems"
+              description="IDE practice problems will appear here when available."
+            />
+          ) : (
+            <div className="space-y-5">
+              {ideWeeks.map((weekGroup) => (
+                <section key={`ide-week-${weekGroup.week_number}`} className="space-y-3">
+                  <h3 className="text-lg font-semibold">Week {weekGroup.week_number}</h3>
+                  <div className="space-y-3">
+                    {(weekGroup.problems || []).map((problem) => (
+                      <div key={problem.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-surface-border bg-surface-raised px-4 py-3">
+                        <div>
+                          <p className="font-semibold text-slate-100">{problem.title}</p>
+                          <p className="mt-1 text-sm text-surface-muted">Language: {String(problem.language || 'python').toUpperCase()}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={problem.difficulty === 'easy' ? 'success' : problem.difficulty === 'medium' ? 'warning' : 'danger'}>
+                            {problem.difficulty}
+                          </Badge>
+                          <Link to={`/ide/${problem.id}`}>
+                            <Button size="sm">Solve →</Button>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
           )}
         </Card>

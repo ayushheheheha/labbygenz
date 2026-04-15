@@ -46,13 +46,13 @@ export default function App() {
           <Route path="/auth/callback" element={<OAuthCallback />} />
 
           <Route element={<ProtectedRoute />}>
+            <Route path="/ide/:problemId" element={<IDEPractice />} />
             <Route element={<StudentLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/courses/:slug" element={<CourseDetail />} />
               <Route path="/courses/:slug/ide-problems" element={<IDEProblemList />} />
               <Route path="/quiz/:id" element={<QuizAttempt />} />
               <Route path="/quiz/:id/result/:attemptId" element={<QuizResult />} />
-              <Route path="/ide/:problemId" element={<IDEPractice />} />
             </Route>
           </Route>
 

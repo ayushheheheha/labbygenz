@@ -11,6 +11,7 @@ import Input from '../../components/ui/Input'
 import RichText from '../../components/shared/RichText'
 import CodeBlock from '../../components/shared/CodeBlock'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { resolveMediaUrl } from '../../utils/media'
 
 function formatTime(totalSeconds) {
   const safe = Math.max(0, totalSeconds)
@@ -46,7 +47,7 @@ export default function QuizAttempt() {
         const resolvedQuiz = data?.quiz || data
         setQuiz(resolvedQuiz)
         const limitMinutes = Number(resolvedQuiz?.time_limit_minutes || 0)
-        setTimeLeft(limitMinutes > 0 ? limitMinutes * 60 : 0)
+        setTimeLeft(limitMinutes > 0 ? limitMinutes * 60 : null)
       } catch {
         toast.error('Unable to load quiz')
       } finally {
@@ -59,6 +60,7 @@ export default function QuizAttempt() {
 
   const questions = useMemo(() => (Array.isArray(quiz?.questions) ? quiz.questions : []), [quiz])
   const currentQuestion = questions[currentIndex] || null
+  const isTimedQuiz = Number(quiz?.time_limit_minutes || 0) > 0
 
   const answeredCount = useMemo(() => {
     return questions.reduce((total, question) => {
@@ -86,7 +88,7 @@ export default function QuizAttempt() {
   }, [answers, questions])
 
   useEffect(() => {
-    if (!attemptId || !timeLeft) return undefined
+    if (!attemptId || !isTimedQuiz || timeLeft === null || timeLeft <= 0) return undefined
     if (submitLoading) return undefined
 
     const tick = setInterval(() => {
@@ -103,11 +105,11 @@ export default function QuizAttempt() {
   }, [attemptId, submitLoading, timeLeft])
 
   useEffect(() => {
-    if (!attemptId || timeLeft > 0 || submitLoading || autoSubmitting.current) return
+    if (!attemptId || !isTimedQuiz || timeLeft === null || timeLeft > 0 || submitLoading || autoSubmitting.current) return
     autoSubmitting.current = true
     toast('Time is up. Submitting your quiz...')
     void onSubmit(true)
-  }, [attemptId, submitLoading, timeLeft])
+  }, [attemptId, isTimedQuiz, submitLoading, timeLeft])
 
   const markVisited = (index) => {
     setVisited((prev) => (prev.includes(index) ? prev : [...prev, index]))
@@ -194,8 +196,27 @@ export default function QuizAttempt() {
     setSubmitLoading(true)
     setConfirmOpen(false)
     try {
+      const normalizedAnswers = questions.map((question) => {
+        const answer = answers[question.id]
+        if (!answer) {
+          return {
+            question_id: question.id,
+            selected_option_ids: [],
+            text_answer: null,
+            numerical_answer: null,
+          }
+        }
+
+        return {
+          question_id: question.id,
+          selected_option_ids: Array.isArray(answer.selected_option_ids) ? answer.selected_option_ids : [],
+          text_answer: answer.text_answer ?? null,
+          numerical_answer: answer.numerical_answer === '' ? null : (answer.numerical_answer ?? null),
+        }
+      })
+
       const payload = {
-        answers: Object.values(answers),
+        answers: normalizedAnswers,
       }
 
       const { data } = await submitAttemptApi(attemptId, payload)
@@ -304,7 +325,9 @@ export default function QuizAttempt() {
           </div>
           <div className="rounded-xl border border-surface-border bg-surface-raised p-3">
             <p className="text-xs text-surface-muted">Time Limit</p>
-            <p className="mt-1 text-xl font-semibold">{quiz.time_limit_minutes || 0} min</p>
+            <p className="mt-1 text-xl font-semibold">
+              {isTimedQuiz ? `${quiz.time_limit_minutes} min` : 'Untimed'}
+            </p>
           </div>
         </div>
 
@@ -327,7 +350,11 @@ export default function QuizAttempt() {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="info">Answered {answeredCount}/{questions.length}</Badge>
-            <Badge variant={timeLeft < 60 ? 'danger' : 'warning'}>{formatTime(timeLeft)}</Badge>
+            {isTimedQuiz ? (
+              <Badge variant={timeLeft !== null && timeLeft < 60 ? 'danger' : 'warning'}>{formatTime(timeLeft || 0)}</Badge>
+            ) : (
+              <Badge variant="success">Untimed</Badge>
+            )}
             <Button variant="danger" onClick={() => setConfirmOpen(true)} disabled={submitLoading}>
               Submit Quiz
             </Button>
@@ -351,11 +378,13 @@ export default function QuizAttempt() {
               />
             ) : null}
             {currentQuestion.stem_image ? (
-              <img
-                src={currentQuestion.stem_image}
-                alt="Question stem"
-                className="max-h-72 w-full rounded-lg border border-surface-border object-contain"
-              />
+              <div className="mt-2 inline-flex max-w-full rounded-lg border border-surface-border bg-surface-raised p-1">
+                <img
+                  src={resolveMediaUrl(currentQuestion.stem_image)}
+                  alt="Question stem"
+                  className="block h-auto max-h-[420px] w-auto max-w-full rounded-md object-contain"
+                />
+              </div>
             ) : null}
           </div>
 
