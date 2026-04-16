@@ -1,12 +1,4 @@
-const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-
-function getBackendOrigin() {
-  try {
-    return new URL(apiBase).origin
-  } catch {
-    return 'http://localhost:8000'
-  }
-}
+import { backendBaseUrl } from './api'
 
 export function resolveMediaUrl(value) {
   if (!value) return ''
@@ -24,8 +16,8 @@ export function resolveMediaUrl(value) {
   }
 
   if (raw.startsWith('/')) {
-    return `${getBackendOrigin()}${raw}`
+    return `${backendBaseUrl}${raw}`
   }
 
-  return `${getBackendOrigin()}/${raw}`
+  return `${backendBaseUrl}/${raw}`
 }

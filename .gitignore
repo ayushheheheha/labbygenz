@@ -41,3 +41,9 @@ vendor/
 # Runtime temp
 *.tmp
 *.temp
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar

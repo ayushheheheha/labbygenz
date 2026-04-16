@@ -5,6 +5,7 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { loginApi } from '../../api/auth.api'
 import useAuth from '../../hooks/useAuth'
+import { googleAuthUrl } from '../../utils/api'
 
 function getErrorMessage(error) {
   return error?.response?.data?.error || error?.response?.data?.message || 'Unable to sign in. Please try again.'
@@ -97,7 +98,7 @@ export default function Login() {
         <button
           type="button"
           onClick={() => {
-            window.location.href = 'http://localhost:8000/api/auth/google'
+            window.location.href = googleAuthUrl
           }}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300/40 px-4 py-2.5 text-sm font-medium text-slate-100 transition hover:bg-surface-raised"
         >
