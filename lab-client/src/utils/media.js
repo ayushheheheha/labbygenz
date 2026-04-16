@@ -1,4 +1,4 @@
-import { backendBaseUrl } from './api'
+import { backendBaseUrl, backendOrigin } from './api'
 
 export function resolveMediaUrl(value) {
   if (!value) return ''
@@ -15,8 +15,35 @@ export function resolveMediaUrl(value) {
     return raw
   }
 
-  if (raw.startsWith('/')) {
+  if (raw.startsWith('/public/')) {
+    return `${backendOrigin}${raw}`
+  }
+
+  if (raw.startsWith('/storage/')) {
     return `${backendBaseUrl}${raw}`
+  }
+
+  if (raw.startsWith('/question-images/') || raw.startsWith('/avatars/')) {
+    return `${backendBaseUrl}/storage${raw}`
+  }
+
+  if (raw.startsWith('/')) {
+    return `${backendOrigin}${raw}`
+  }
+
+  if (
+    raw.startsWith('question-images/') ||
+    raw.startsWith('avatars/')
+  ) {
+    return `${backendBaseUrl}/storage/${raw}`
+  }
+
+  if (raw.startsWith('public/')) {
+    return `${backendOrigin}/${raw}`
+  }
+
+  if (raw.startsWith('storage/')) {
+    return `${backendBaseUrl}/${raw}`
   }
 
   return `${backendBaseUrl}/${raw}`
